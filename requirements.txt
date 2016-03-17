@@ -1,0 +1,7 @@
+click==6.3
+dj-database-url==0.4.0
+Django==1.9.4
+djangorestframework==3.3.3
+ordereddict==1.1
+psycopg2==2.6.1
+python-dotenv==0.4.0

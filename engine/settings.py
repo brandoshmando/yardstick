@@ -11,6 +11,13 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import dj_database_url
+
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '../.env')
+load_dotenv(dotenv_path)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'custom_user',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -71,15 +79,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'engine.wsgi.application'
 
 
-# Database
+###DATABASE
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
+default = dj_database_url.config()
+default['CONN_MAX_AGE'] = int(os.environ.get('CONN_MAX_AGE', 0))
+default['ENGINE'] = 'django.db.backends.postgresql'
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': default
 }
+###END
 
 
 # Password validation
