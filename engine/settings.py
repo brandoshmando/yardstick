@@ -27,16 +27,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ejc42bf-v)txp7=mjmk8@8!z!4q(^g$%g*u!e$og2b2(7_yv^n'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Custom Auth User
+AUTH_USER_MODEL = 'yardstick.AuthUser'
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'custom_user',
+    'yardstick',
+    'test_without_migrations',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -127,3 +129,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+####PGCRYPTO
+PGCRYPTO_DEFAULT_KEY = os.environ.get('PGCRYPTO_DEFAULT_KEY')
+####
