@@ -1,21 +1,30 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericRelation
 
-from yardstick.models import Manager, Administrator, Arbiter, Subject
+from yardstick.models import AuthUser
+
+class OrganizationManager(models.Manager):
+    def create_account(self, name, unique_identifier, auth_data):
+        organization = Organization.objects.create(
+            name=name
+        )
+
+        try:
+            auth_user = AuthUser.objects.get(email=auth_data['email'])
+        except AuthUser.DoesNotExist:
+            auth_user = AuthUser.objects.create(**auth_data)
+
+        from yardstick.models import Manager
+        Manager.objects.create(
+            organization_id=organization,
+            user=auth_user,
+            unique_identifier=unique_identifier
+        )
+
+        return organization
 
 class Organization(models.Model):
     name = models.CharField(max_length=56)
     created_at = models.DateTimeField(auto_now=True)
 
-    managers = GenericRelation(Manager,
-                        object_id_field='organization_pk'
-                     )
-    administrators = GenericRelation(Administrator,
-                        object_id_field='organization_pk'
-                     )
-    arbiters = GenericRelation(Arbiter,
-                        object_id_field='organization_pk'
-                     )
-    subjects = GenericRelation(Arbiter,
-                        object_id_field='organization_pk'
-                     )
+    objects = OrganizationManager()

@@ -132,5 +132,5 @@ STATIC_URL = '/static/'
 
 
 ####PGCRYPTO
-PGCRYPTO_DEFAULT_KEY = os.environ.get('PGCRYPTO_DEFAULT_KEY')
+# PGCRYPTO_DEFAULT_KEY = os.environ.get('PGCRYPTO_DEFAULT_KEY')
 ####

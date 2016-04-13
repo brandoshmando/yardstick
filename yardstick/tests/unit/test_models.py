@@ -58,19 +58,19 @@ class TestAuthUserManagerOrganizationCombo(TestCase):
         )
         self.manager = Manager.objects.create(
             organization_id=self.organization,
-            user_id=self.user
+            user=self.user
         )
         self.administrator = Administrator.objects.create(
             organization_id=self.organization,
-            user_id=self.user
+            user=self.user
         )
         self.arbiter = Arbiter.objects.create(
             organization_id=self.organization,
-            user_id=self.user
+            user=self.user
         )
         self.subject = Subject.objects.create(
             organization_id=self.organization,
-            user_id=self.user
+            user=self.user
         )
 
     def test_unique_org_user_combo_manager(self):
@@ -78,7 +78,7 @@ class TestAuthUserManagerOrganizationCombo(TestCase):
         try:
             Manager.objects.create(
                 organization_id=self.organization,
-                user_id=self.user
+                user=self.user
             )
         except IntegrityError:
             exception = True
@@ -90,7 +90,7 @@ class TestAuthUserManagerOrganizationCombo(TestCase):
         try:
             Administrator.objects.create(
                 organization_id=self.organization,
-                user_id=self.user
+                user=self.user
             )
         except IntegrityError:
             exception = True
@@ -102,7 +102,7 @@ class TestAuthUserManagerOrganizationCombo(TestCase):
         try:
             Arbiter.objects.create(
                 organization_id=self.organization,
-                user_id=self.user
+                user=self.user
             )
         except IntegrityError:
             exception = True
@@ -114,9 +114,38 @@ class TestAuthUserManagerOrganizationCombo(TestCase):
         try:
             Subject.objects.create(
                 organization_id=self.organization,
-                user_id=self.user
+                user=self.user
             )
         except IntegrityError:
             exception = True
 
         self.assertTrue(exception)
+
+
+class TestOrganizationCreate(TestCase):
+    def test_create_new_org(self):
+        name = "Test Name"
+        ui = str(uuid.uuid4())
+        auth_data = {
+            'first_name':'Brando',
+            'last_name':'Shmando',
+            'email':"test@example.com",
+            'password':"testpassword"
+        }
+
+        organization = Organization.objects.create_account(
+            name=name,
+            unique_identifier=ui,
+            auth_data=auth_data
+        )
+
+
+        self.assertIsNotNone(organization.managers.first())
+        self.assertEqual(organization.managers.all().count(), 1)
+        self.assertIsNotNone(organization.managers.first().user)
+
+        self.assertEqual(organization.name, name)
+        self.assertEqual(organization.managers.first().user.email, auth_data['email'])
+        self.assertEqual(organization.managers.first().unique_identifier, ui)
+        self.assertIsNotNone(organization.managers.first().user.password)
+        self.assertFalse(organization.managers.first().user.is_staff)
