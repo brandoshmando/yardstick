@@ -2,7 +2,8 @@ import uuid
 from django.test import TestCase
 from django.db import IntegrityError
 
-from yardstick.models import AuthUser
+
+from yardstick.models import AuthUser, Organization, Manager, Administrator, Arbiter, Subject
 
 class TestAuthUser(TestCase):
     def test_auth_user_created_email(self):
@@ -15,42 +16,18 @@ class TestAuthUser(TestCase):
         self.assertFalse(user.is_superuser)
         self.assertIsNotNone(user.password)
         self.assertIsNotNone(user.email)
-        self.assertIsNone(user.unique_identifier)
 
-    def test_auth_user_created_unque_identifier(self):
-        user = AuthUser.objects.create_user(
-            unique_identifier=str(uuid.uuid4()),
-            password='testpassword'
-        )
-
-        self.assertFalse(user.is_staff)
-        self.assertFalse(user.is_superuser)
-        self.assertIsNotNone(user.password)
-        self.assertIsNotNone(user.unique_identifier)
-        self.assertIsNone(user.email)
-
-    def test_email_unique_identifier_missing(self):
+    def test_email_not_unique(self):
         exception = False
-        try:
-            user = AuthUser.objects.create_user(
-                password='testpassword'
-            )
-        except ValueError:
-            exception = True
-
-        self.assertTrue(exception)
-
-    def test_unique_identifier_not_unique(self):
-        exception = False
-        identifier = str(uuid.uuid4())
+        email = 'test@example.com'
 
         user = AuthUser.objects.create_user(
-            unique_identifier=identifier,
+            email=email,
             password='testpassword'
         )
         try:
             AuthUser.objects.create_user(
-                unique_identifier=identifier,
+                email=email,
                 password='testpassword'
             )
         except IntegrityError:
@@ -68,43 +45,76 @@ class TestAuthUser(TestCase):
         self.assertTrue(user.is_superuser)
         self.assertIsNotNone(user.password)
         self.assertIsNotNone(user.email)
-        self.assertIsNone(user.unique_identifier)
 
-    def test_auth_user_superuser_created_unque_identifier(self):
-        user = AuthUser.objects.create_superuser(
-            unique_identifier=str(uuid.uuid4()),
+
+class TestAuthUserManagerOrganizationCombo(TestCase):
+    def setUp(self):
+        self.user = AuthUser.objects.create_user(
+            email='test@example.com',
             password='testpassword'
         )
+        self.organization = Organization.objects.create(
+            name='Test Org'
+        )
+        self.manager = Manager.objects.create(
+            organization_id=self.organization,
+            user_id=self.user
+        )
+        self.administrator = Administrator.objects.create(
+            organization_id=self.organization,
+            user_id=self.user
+        )
+        self.arbiter = Arbiter.objects.create(
+            organization_id=self.organization,
+            user_id=self.user
+        )
+        self.subject = Subject.objects.create(
+            organization_id=self.organization,
+            user_id=self.user
+        )
 
-        self.assertTrue(user.is_staff)
-        self.assertTrue(user.is_superuser)
-        self.assertIsNotNone(user.password)
-        self.assertIsNotNone(user.unique_identifier)
-        self.assertIsNone(user.email)
-
-    def test_superuser_email_unique_identifier_missing(self):
+    def test_unique_org_user_combo_manager(self):
         exception = False
         try:
-            user = AuthUser.objects.create_superuser(
-                password='testpassword'
+            Manager.objects.create(
+                organization_id=self.organization,
+                user_id=self.user
             )
-        except ValueError:
+        except IntegrityError:
             exception = True
 
         self.assertTrue(exception)
 
-    def test_superuser_unique_identifier_not_unique(self):
+    def test_unique_org_user_combo_administrator(self):
         exception = False
-        identifier = str(uuid.uuid4())
-
-        user = AuthUser.objects.create_superuser(
-            unique_identifier=identifier,
-            password='testpassword'
-        )
         try:
-            AuthUser.objects.create_superuser(
-                unique_identifier=identifier,
-                password='testpassword'
+            Administrator.objects.create(
+                organization_id=self.organization,
+                user_id=self.user
+            )
+        except IntegrityError:
+            exception = True
+
+        self.assertTrue(exception)
+
+    def test_unique_org_user_combo_arbiter(self):
+        exception = False
+        try:
+            Arbiter.objects.create(
+                organization_id=self.organization,
+                user_id=self.user
+            )
+        except IntegrityError:
+            exception = True
+
+        self.assertTrue(exception)
+
+    def test_unique_org_user_combo_subject(self):
+        exception = False
+        try:
+            Subject.objects.create(
+                organization_id=self.organization,
+                user_id=self.user
             )
         except IntegrityError:
             exception = True
