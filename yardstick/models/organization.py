@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.contenttypes.fields import GenericRelation
 
 from yardstick.models import AuthUser
 

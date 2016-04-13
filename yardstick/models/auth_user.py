@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.models import BaseUserManager
-from django.contrib.contenttypes.fields import GenericRelation
 
 class AuthUserManager(BaseUserManager):
     def _create_user(self, password, is_staff, is_superuser, email=None, **extra_fields):
