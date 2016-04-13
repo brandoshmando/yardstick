@@ -1,7 +1,7 @@
 import uuid
 from django.test import TestCase
 from django.db import IntegrityError
-
+from rest_framework.authtoken.models import Token
 
 from yardstick.models import AuthUser, Organization, Manager, Administrator, Arbiter, Subject
 
@@ -46,6 +46,21 @@ class TestAuthUser(TestCase):
         self.assertIsNotNone(user.password)
         self.assertIsNotNone(user.email)
 
+    def test_auth_user_token_created(self):
+        user = AuthUser.objects.create_user(
+            email='test@example.com',
+            password='testpassword'
+        )
+
+        self.assertIsNotNone(Token.objects.get(user=user).key)
+
+    def test_auth_user_superuser_token_created(self):
+        user = AuthUser.objects.create_superuser(
+            email='test@example.com',
+            password='testpassword'
+        )
+
+        self.assertIsNotNone(Token.objects.get(user=user).key)
 
 class TestAuthUserManagerOrganizationCombo(TestCase):
     def setUp(self):

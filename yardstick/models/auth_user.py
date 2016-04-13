@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.models import BaseUserManager
+from rest_framework.authtoken.models import Token
 
 class AuthUserManager(BaseUserManager):
     def _create_user(self, password, is_staff, is_superuser, email=None, **extra_fields):
@@ -24,11 +25,13 @@ class AuthUserManager(BaseUserManager):
         return user
 
     def create_user(self, email=None, password=None, **extra_fields):
-        return self._create_user(password, False, False, email,  **extra_fields)
-
+        user = self._create_user(password, False, False, email,  **extra_fields)
+        Token.objects.create(user=user)
+        return user
     def create_superuser(self, email=None, password=None, **extra_fields):
-        return self._create_user(password, True, True, email, **extra_fields)
-
+        user = self._create_user(password, True, True, email, **extra_fields)
+        Token.objects.create(user=user)
+        return user
 
 class AuthUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), max_length=254, unique=True, blank=True, null=True)
