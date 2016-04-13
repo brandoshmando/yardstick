@@ -123,6 +123,12 @@ class TestAuthUserManagerOrganizationCombo(TestCase):
 
 
 class TestOrganizationCreate(TestCase):
+    def setUp(self):
+        self.user = AuthUser.objects.create_user(
+            email='test_first@example.com',
+            password='testpassword'
+        )
+
     def test_create_new_org(self):
         name = "Test Name"
         ui = str(uuid.uuid4())
@@ -149,3 +155,26 @@ class TestOrganizationCreate(TestCase):
         self.assertEqual(organization.managers.first().unique_identifier, ui)
         self.assertIsNotNone(organization.managers.first().user.password)
         self.assertFalse(organization.managers.first().user.is_staff)
+
+    def test_create_new_org_existing_user(self):
+        name = "Test Name"
+        ui = str(uuid.uuid4())
+        auth_data = {
+            'first_name':'Brando',
+            'last_name':'Shmando',
+            'email':"test_first@example.com",
+            'password':"testpassword"
+        }
+
+        organization = Organization.objects.create_account(
+            name=name,
+            unique_identifier=ui,
+            auth_data=auth_data
+        )
+
+        self.assertIsNotNone(organization.managers.first())
+        self.assertEqual(organization.managers.all().count(), 1)
+        self.assertIsNotNone(organization.managers.first().user)
+
+        self.assertEqual(organization.managers.first().user, self.user)
+        self.assertEqual(organization.managers.first().user.email, auth_data['email'])

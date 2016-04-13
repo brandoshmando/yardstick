@@ -11,7 +11,7 @@ class OrganizationManager(models.Manager):
         try:
             auth_user = AuthUser.objects.get(email=auth_data['email'])
         except AuthUser.DoesNotExist:
-            auth_user = AuthUser.objects.create(**auth_data)
+            auth_user = AuthUser.objects.create_user(**auth_data)
 
         from yardstick.models import Manager
         Manager.objects.create(
