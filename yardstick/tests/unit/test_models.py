@@ -147,17 +147,15 @@ class TestOrganizationCreate(TestCase):
     def test_create_new_org(self):
         name = "Test Name"
         ui = str(uuid.uuid4())
-        auth_data = {
-            'first_name':'Brando',
-            'last_name':'Shmando',
-            'email':"test@example.com",
-            'password':"testpassword"
-        }
+        email = "test_first@example.com"
 
-        organization = Organization.objects.create_account(
+        organization, mgr, auth_user = Organization.objects.create_account(
             name=name,
             unique_identifier=ui,
-            auth_data=auth_data
+            first_name='Brando',
+            last_name='Shmando',
+            email=email,
+            password="testpassword"
         )
 
 
@@ -166,7 +164,7 @@ class TestOrganizationCreate(TestCase):
         self.assertIsNotNone(organization.managers.first().user)
 
         self.assertEqual(organization.name, name)
-        self.assertEqual(organization.managers.first().user.email, auth_data['email'])
+        self.assertEqual(organization.managers.first().user.email, email)
         self.assertEqual(organization.managers.first().unique_identifier, ui)
         self.assertIsNotNone(organization.managers.first().user.password)
         self.assertFalse(organization.managers.first().user.is_staff)
@@ -174,17 +172,15 @@ class TestOrganizationCreate(TestCase):
     def test_create_new_org_existing_user(self):
         name = "Test Name"
         ui = str(uuid.uuid4())
-        auth_data = {
-            'first_name':'Brando',
-            'last_name':'Shmando',
-            'email':"test_first@example.com",
-            'password':"testpassword"
-        }
+        email = "test_first@example.com"
 
-        organization = Organization.objects.create_account(
+        organization, mgr, auth_user = Organization.objects.create_account(
             name=name,
             unique_identifier=ui,
-            auth_data=auth_data
+            first_name='Brando',
+            last_name='Shmando',
+            email=email,
+            password="testpassword"
         )
 
         self.assertIsNotNone(organization.managers.first())
@@ -192,4 +188,4 @@ class TestOrganizationCreate(TestCase):
         self.assertIsNotNone(organization.managers.first().user)
 
         self.assertEqual(organization.managers.first().user, self.user)
-        self.assertEqual(organization.managers.first().user.email, auth_data['email'])
+        self.assertEqual(organization.managers.first().user.email, email)

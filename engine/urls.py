@@ -13,9 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
-from django.contrib import admin
 
-urlpatterns = [
+from django.conf.urls import url, patterns
+from django.contrib import admin
+from rest_framework.urlpatterns import format_suffix_patterns
+
+from yardstick import views
+
+urlpatterns = format_suffix_patterns(patterns('yardstick.views',
+    url(r'^signup/', views.OrganizationCreate.as_view(), name='organization-create'),
+), allowed=['json', 'jsonp', 'xml'])
+
+urlpatterns += [
     url(r'^admin/', admin.site.urls),
 ]
