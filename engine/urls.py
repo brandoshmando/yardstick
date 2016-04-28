@@ -20,7 +20,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from yardstick import views
 
-urlpatterns = format_suffix_patterns(patterns('yardstick.views',
+urlpatterns = format_suffix_patterns(patterns('',
     url(r'^signup/', views.OrganizationCreate.as_view(), name='organization-create'),
     url(r'^signin/', views.UserAuthentication.as_view(), name='user-auth')
 ), allowed=['json', 'jsonp', 'xml'])
