@@ -22,6 +22,7 @@ from yardstick import views
 
 urlpatterns = format_suffix_patterns(patterns('yardstick.views',
     url(r'^signup/', views.OrganizationCreate.as_view(), name='organization-create'),
+    url(r'^signin/', views.UserAuthentication.as_view(), name='user-auth')
 ), allowed=['json', 'jsonp', 'xml'])
 
 urlpatterns += [

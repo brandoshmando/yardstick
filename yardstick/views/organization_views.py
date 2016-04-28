@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 
-from yardstick.serializers import OraganizationPostSerializer, SignUpResponseSerializer
+from yardstick.serializers import OraganizationPostSerializer, SignInResponseSerializer
 from yardstick.models import Organization
 
 class OrganizationCreate(generics.CreateAPIView):
@@ -19,6 +19,6 @@ class OrganizationCreate(generics.CreateAPIView):
                     email=serializer.data.get('email'),
                     password=serializer.data.get('password')
                   )
-            signin_serializer = SignUpResponseSerializer(instance=usr)
+            signin_serializer = SignInResponseSerializer(instance=usr)
             return Response(signin_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
